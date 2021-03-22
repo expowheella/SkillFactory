@@ -4,5 +4,5 @@ class Rectangle:
         self.width = width
 
     def __str__(self):
-        return f'Длина = {self.length}м,', f'Ширина = {self.width}м, ' \
-                        f'\n\nПлощадь фигуры = {self.length * self.width}кв.м'
+        return f"Длина = {self.length}м, Ширина = {self.width}м,  \
+                        \n\nПлощадь фигуры = {self.length * self.width}кв.м"
