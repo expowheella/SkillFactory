@@ -1,0 +1,1 @@
+this is an example describing polymorphism in Python by class inheritance using @classmethod in order to access to methods of parent class from child class
