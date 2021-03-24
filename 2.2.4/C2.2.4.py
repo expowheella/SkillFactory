@@ -9,5 +9,8 @@ class Square(SquareFactory):
         return SquareFactory.sq_side(arg)
 
 
-r = Square()
-print(r.get_result(6))
+r = Square()  # r - это экземпляр класса Square
+
+# два варианта передачи аргумента при вызове одного и того же метода:
+print(Square.get_result(r, 6))  # вызов метода get_result класса Square с указанием экземпляра класса
+print(r.get_result(6))  # то же самое, только по-другому записано
