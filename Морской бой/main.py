@@ -1,4 +1,6 @@
 #  Sea Battle Game
+from random import randint
+
 
 # Exceptions
 class BoardException(Exception):  # all exceptions
@@ -86,7 +88,7 @@ class Ship:
 
 
 class Board:
-    def __init__(self, hidden=False, size=6):
+    def __init__(self, hidden=False, size=None):
         # the board parameters
         self.size = size
         self.hidden = hidden  # open or hide from eyes the competitor's board
@@ -140,8 +142,8 @@ class Board:
 
         for part_of_ship in object.dots:  # Dot(1, 2) in [Dot(1, 2), Dot(1, 3)]
             self.field[part_of_ship.x][part_of_ship.y] = "■"  # replacing "0" with "*" in the field[1,2]
-            self.occupied.append(
-                part_of_ship)  # adding to the list of occupied dots on the field the coordinate field[1,2]
+            self.occupied.append(part_of_ship)  # adding to the list of occupied dots o
+            # n the field the coordinate field[1,2]
 
         self.ships.append(object)  # adding the ship into the list of ships
         self.contour(object)  # adding the object into the contour to show that the contur is occupied by the object
@@ -185,9 +187,10 @@ class Board:
 
 
 class Player:
-    def __init__(self):
-        self.board = board
-        self.enemy = enemy
+    def __init__(self, board, enemy):
+        #  two boards: player's and the enemy's
+        self.player_board = board
+        self.enemy_board = enemy
 
     def ask(self):
         raise NotImplementedError()
@@ -195,22 +198,79 @@ class Player:
     def move(self):
         while True:
             try:
-                target = self.ask()
-                repeat = self.enemy.shot(target)
+                target = self.ask()  # request to input coordinates to shoot
+                repeat = self.enemy_board.shot(target)
                 return repeat
             except BoardException as e:
                 print(e)
 
 
+class AI(Player):
+    def ask(self):
+        d = Dot(randint(0, 5), randint(0, 5))  # the AI is shooting
+        print(f'Ход компьютера: {d.x + 1} {d.y + 1}')  # to show user where AI has shot
+        return d
+
+
+class User(Player):
+    def ask(self):
+        while True:
+            coords = input("Ваш ход: ").split()  # ['1', '2']
+
+            if len(coords) != 2:
+                print("Введите две координаты!")
+                continue
+
+            x, y = coords  # x = '1', y = '2'
+
+            if not x.isdigit() or not y.isdigit():
+                print("Нужно вводить числа, а не другие символы!")
+                continue
+
+            x, y = int(x), int(y)
+
+            return Dot(x - 1, y - 1)
+
+
+class Game:
+    def make_board(self):
+        lengths = [3, 2]  # ship lengths
+        board = Board(size=self.size)
+        attempts = 0
+        for l in lengths:
+            while True:
+                attempts += 1
+                if attempts > 2000:
+                    return None
+                ship = Ship(Dot(randint(0, self.size), randint(0, self.size)), l,
+                            randint(0, 1))  # filling the board with ships randomly
+                try:
+                    board.add_ship(ship)
+                    break
+                except BoardWrongShipException:
+                    pass
+        board.begin()
+        return board
+
+    def random_board(self):
+        board = None
+        while board is None:
+            board = self.make_board()
+        return board
+
 
 # cruiser = Ship(Dot(1, 2), 2, 1)
 # print(cruiser.dots)
 # print(Ship(Dot(1, 2), 2, 1).shot(Dot(1, 2)))
+#
+# b = Board()
+# b.add_ship(Ship(Dot(1, 1), 1, 0))
+# #
+# # b.add_ship(Ship(Dot(3, 3), 2, 1))
+# # # b.contour(Ship(Dot(3, 1), 2, 0))
+# #
+# print(b)
 
-b = Board()
-b.add_ship(Ship(Dot(1, 1), 1, 0))
-
-b.add_ship(Ship(Dot(3, 3), 2, 1))
-# b.contour(Ship(Dot(3, 1), 2, 0))
-
-print(b)
+g = Game()
+g.size = 6
+print(g.random_board())
