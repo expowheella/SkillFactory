@@ -1,0 +1,2 @@
+New string 1
+New string 2
